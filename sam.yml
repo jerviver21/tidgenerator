@@ -1,0 +1,29 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Order System - Tid Generator
+
+Resources:
+  TidGeneratorAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: test
+      MethodSettings:
+        - ResourcePath: /tid
+          HttpMethod: GET
+  TidGenerator:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.orders.system.lambdas.TidGenerator::handler
+      Runtime: java17
+      MemorySize: 512
+      Timeout: 10
+      CodeUri: target/tidgenerator-1.0-SNAPSHOT.jar
+      Role: arn:aws:iam::284568258274:role/lambda_basic_execution
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TidGeneratorAPI
+            Path: /tid
+            Method: GET
